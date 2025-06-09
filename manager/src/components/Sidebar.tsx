@@ -1,6 +1,7 @@
 import { FaExclamationTriangle, FaQuestionCircle } from "react-icons/fa";
 import SidebarItem from "./SidebarItem";
 import { FaCar } from "react-icons/fa";
+import { FaFileAlt } from "react-icons/fa";
 
 const Sidebar = ({ isOpen }: { isOpen: boolean }) => {
   return (
@@ -21,7 +22,7 @@ const Sidebar = ({ isOpen }: { isOpen: boolean }) => {
             <SidebarItem to="/qlphuongtien" icon={FaCar} label="Quản lý phương tiện" />
           </li>
           <li>
-            <SidebarItem to="/qlminhchung" icon={FaQuestionCircle} label="Quản lý minh chứng" />
+            <SidebarItem to="/qlminhchung" icon={FaFileAlt} label="Quản lý minh chứng" />
           </li>
         </ul>
       </nav>

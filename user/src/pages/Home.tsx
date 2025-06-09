@@ -188,7 +188,7 @@ function RefutationModal({ open, onClose, violationId }: { open: boolean; onClos
 export default function Home() {
   const { currentUser, logout } = useAuth();
   const [tab, setTab] = useState("search");
-  const [searchResult, setSearchResult] = useState<any>(null);
+  const [searchResult, setSearchResult] = useState<any[]>([]);
   const [searchError, setSearchError] = useState<string | null>(null);
   const [licensePlate, setLicensePlate] = useState("");
   const [registration, setRegistration] = useState({ licensePlate: "", ownerName: "", phone: "" });
@@ -200,6 +200,12 @@ export default function Home() {
   const [loadingRefutations, setLoadingRefutations] = useState(false);
   const [errorRefutations, setErrorRefutations] = useState<string | null>(null);
 
+  const violationTypes = {
+    0: 'Vượt đèn đỏ',
+    1: 'Quá tốc độ',
+    2: 'Leo vỉa hè'
+  };
+
   const handleSearch = async (e: React.FormEvent) => {
     e.preventDefault();
     try {
@@ -208,10 +214,9 @@ export default function Home() {
       setSearchResult(response.data);
     } catch (error: any) {
       setSearchError(error.response?.data?.message || "Không tìm thấy thông tin vi phạm");
-      setSearchResult(null);
+      setSearchResult([]);
     }
   };
-
 
   const handleRegistration = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -228,7 +233,6 @@ export default function Home() {
     }
   };
 
-  // Fetch refutations when tab changes to 'refutations' and user is logged in
   useEffect(() => {
     if (tab === "refutations" && currentUser) {
       setLoadingRefutations(true);
@@ -242,7 +246,6 @@ export default function Home() {
 
   return (
     <div className="min-h-screen bg-gray-50">
-      {/* Header */}
       <header className="flex items-center justify-between px-8 py-6 bg-white border-b">
         <div className="text-2xl font-bold tracking-tight text-pink-600 select-none">PhatNguoi.Com</div>
         <div className="space-x-2 text-base font-normal">
@@ -275,15 +278,12 @@ export default function Home() {
         </div>
       </header>
 
-      {/* Modal */}
       <LoginModal open={showLogin} onClose={() => setShowLogin(false)} />
       <RegisterModal open={showRegister} onClose={() => setShowRegister(false)} />
       <RefutationModal open={showRefutation} onClose={() => setShowRefutation(false)} violationId={refuteViolationId} />
 
-      {/* Main card */}
       <main className="flex justify-center mt-12">
         <div className="bg-white rounded-xl shadow-sm p-8 w-full max-w-xl border border-gray-100">
-          {/* Tabs */}
           <div className="flex space-x-8 border-b mb-8">
             <button
               onClick={() => setTab("search")}
@@ -305,7 +305,6 @@ export default function Home() {
             </button>
           </div>
 
-          {/* Search Tab */}
           {tab === "search" && (
             <form onSubmit={handleSearch} className="space-y-6">
               <div>
@@ -328,40 +327,35 @@ export default function Home() {
               {searchError && (
                 <div className="text-red-500 text-center text-sm mt-2">{searchError}</div>
               )}
-              {searchResult && (
+              {searchResult.length > 0 && (
                 <div className="mt-6">
                   <h3 className="font-semibold mb-3 text-gray-700">Kết quả tra cứu:</h3>
-                  {Array.isArray(searchResult) && searchResult.length > 0 ? (
-                    <div className="divide-y divide-gray-100">
-                      {searchResult.map((item: any) => (
-                        <div key={item.id} className="py-3 grid grid-cols-1 gap-1">
-                          <div className="text-sm text-gray-500">ID: <span className="text-gray-800 font-medium">{item.id}</span></div>
-                          <div className="text-sm text-gray-500">Loại vi phạm: <span className="text-gray-800 font-medium">{item.category}</span></div>
-                          <div className="text-sm text-gray-500">Biển số: <span className="text-gray-800 font-medium">{item.vehicle?.plate}</span></div>
-                          <div className="text-sm text-gray-500">Số tiền phạt: <span className="text-gray-800 font-medium">{item.fine_vnd?.toLocaleString()} VNĐ</span></div>
-                          <div className="text-sm text-gray-500">Bằng chứng: {item.video_url ? (
-                            <a href={item.video_url} target="_blank" rel="noopener noreferrer" className="text-pink-600 underline">Xem video</a>
-                          ) : <span className="text-gray-400">Không có</span>}</div>
-                          <div>
-                            <button
-                              className="mt-2 px-4 py-1 rounded bg-pink-50 text-pink-600 border border-pink-100 hover:bg-pink-100 transition"
-                              onClick={() => { setRefuteViolationId(item.id); setShowRefutation(true); }}
-                            >
-                              Khiếu nại
-                            </button>
-                          </div>
+                  <div className="divide-y divide-gray-100">
+                    {searchResult.map((item: any) => (
+                      <div key={item.id} className="py-3 grid grid-cols-1 gap-1">
+                        <div className="text-sm text-gray-500">ID: <span className="text-gray-800 font-medium">{item.id}</span></div>
+                        <div className="text-sm text-gray-500">Loại vi phạm: <span className="text-gray-800 font-medium">{violationTypes[item.category as keyof typeof violationTypes] || 'Không xác định'}</span></div>
+                        <div className="text-sm text-gray-500">Biển số: <span className="text-gray-800 font-medium">{item.vehicle?.plate}</span></div>
+                        <div className="text-sm text-gray-500">Số tiền phạt: <span className="text-gray-800 font-medium">{item.fine_vnd?.toLocaleString()} VNĐ</span></div>
+                        <div className="text-sm text-gray-500">Bằng chứng: {item.video_url ? (
+                          <a href={item.video_url} target="_blank" rel="noopener noreferrer" className="text-pink-600 underline">Xem video</a>
+                        ) : <span className="text-gray-400">Không có</span>}</div>
+                        <div>
+                          <button
+                            className="mt-2 px-4 py-1 rounded bg-pink-50 text-pink-600 border border-pink-100 hover:bg-pink-100 transition"
+                            onClick={() => { setRefuteViolationId(item.id); setShowRefutation(true); }}
+                          >
+                            Khiếu nại
+                          </button>
                         </div>
-                      ))}
-                    </div>
-                  ) : (
-                    <div className="text-gray-400 text-center">Không có kết quả phù hợp.</div>
-                  )}
+                      </div>
+                    ))}
+                  </div>
                 </div>
               )}
             </form>
           )}
 
-          {/* Refutations Tab */}
           {tab === "refutations" && (
             <div>
               {!currentUser ? (
@@ -389,7 +383,6 @@ export default function Home() {
             </div>
           )}
 
-          {/* Register Tab */}
           {tab === "register" && (
             <div>
               {!currentUser && (
