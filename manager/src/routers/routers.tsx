@@ -10,6 +10,8 @@ import PrivateRoute from "../components/PrivateRoute";
 import Login from "../pages/Login";
 import VehicleManagement from "../pages/VehicleManagement";
 import VehicleDetail from "../pages/VehicleDetail";
+import EvidenceManagement from "../pages/EvidenceManagement";
+import AddViolationFromEvidence from "../pages/AddViolationFromEvidence";
 
 export default function AppRoutes() {
   return (
@@ -24,6 +26,8 @@ export default function AppRoutes() {
         <Route path="/qlkhieunai/detail/:id" element={<RefutationDetail />} />
         <Route path="/qlphuongtien" element={<VehicleManagement />} />
         <Route path="/qlphuongtien/detail/:id" element={<VehicleDetail />} />
+        <Route path="/qlminhchung" element={<EvidenceManagement />} />
+        <Route path="/qlminhchung/add/:id" element={<AddViolationFromEvidence />} />
       </Route>
       <Route path="*" element={<NotFound />} />
     </Routes>

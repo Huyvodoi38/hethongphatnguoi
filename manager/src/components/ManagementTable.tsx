@@ -1,4 +1,5 @@
 import { FaEdit, FaEye, FaTrash } from "react-icons/fa";
+import { createElement } from "react";
 
 interface ManagementTableProps {
   headers: string[];
@@ -7,9 +8,11 @@ interface ManagementTableProps {
   onDetail?: (id: number) => void;
   onEdit?: (id: number) => void;
   onDelete?: (id: number) => void;
+  detailLabel?: string;
+  detailIcon?: React.ComponentType;
 }
 
-const ManagementTable: React.FC<ManagementTableProps> = ({ headers, columns, data, onDetail, onEdit, onDelete }) => {
+const ManagementTable: React.FC<ManagementTableProps> = ({ headers, columns, data, onDetail, onEdit, onDelete, detailLabel, detailIcon }) => {
   const handleDetail = (id: number) => {
     if (onDetail) {
       setTimeout(() => {
@@ -66,8 +69,8 @@ const ManagementTable: React.FC<ManagementTableProps> = ({ headers, columns, dat
                       className="bg-blue-500 text-white px-2 py-1 rounded flex items-center gap-1 cursor-pointer hover:bg-blue-600 active:scale-95 transition-transform"
                       onClick={() => handleDetail(item.id)}
                     >
-                      <FaEye />
-                      Chi tiết
+                      {detailIcon ? createElement(detailIcon) : <FaEye />}
+                      {detailLabel || "Chi tiết"}
                     </button>
                   )}
                   {onEdit && (

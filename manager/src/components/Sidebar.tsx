@@ -20,6 +20,9 @@ const Sidebar = ({ isOpen }: { isOpen: boolean }) => {
           <li>
             <SidebarItem to="/qlphuongtien" icon={FaCar} label="Quản lý phương tiện" />
           </li>
+          <li>
+            <SidebarItem to="/qlminhchung" icon={FaQuestionCircle} label="Quản lý minh chứng" />
+          </li>
         </ul>
       </nav>
     </div>

@@ -7,20 +7,29 @@ import api from "../services/api";
 
 const ViolationManagement = () => {
   const [violations, setViolations] = useState<any[]>([]);
-  const headers = ["ID", "Biển số", "Loại vi phạm", "ID người tạo", "Hành động"];
-  const columns = ["id", "plate", "category", "creator_id"];
+  const headers = ["Thời gian", "Biển số", "Loại vi phạm", "ID người tạo", "Hành động"];
+  const columns = ["created_at", "plate", "category", "creator_id"];
 
   const navigate = useNavigate();
-  const [searchId, setSearchId] = useState("");
+  const [searchMinTime, setSearchMinTime] = useState("");
+  const [searchMaxTime, setSearchMaxTime] = useState("");
   const [searchPlate, setSearchPlate] = useState("");
-  const [inputId, setInputId] = useState("");
+  const [inputMinTime, setInputMinTime] = useState("");
+  const [inputMaxTime, setInputMaxTime] = useState("");
   const [inputPlate, setInputPlate] = useState("");
 
   useEffect(() => {
     const fetchViolations = async () => {
       try {
         const params: any = {};
-        if (searchId) params.violation_id = searchId;
+        const formatDateTime = (value: string) => {
+          if (!value) return value;
+          if (value.length === 16) value += ':00';
+          if (!value.endsWith('Z')) value += 'Z';
+          return value;
+        };
+        if (searchMinTime) params.min_created_at = formatDateTime(searchMinTime);
+        if (searchMaxTime) params.max_created_at = formatDateTime(searchMaxTime);
         if (searchPlate) params.vehicle_plate = searchPlate;
         const res = await api.get(`/violations/`, { params });
         setViolations(res.data);
@@ -29,10 +38,11 @@ const ViolationManagement = () => {
       }
     };
     fetchViolations();
-  }, [searchId, searchPlate]);
+  }, [searchMinTime, searchMaxTime, searchPlate]);
 
   const handleSearch = () => {
-    setSearchId(inputId);
+    setSearchMinTime(inputMinTime);
+    setSearchMaxTime(inputMaxTime);
     setSearchPlate(inputPlate);
   };
 
@@ -69,12 +79,20 @@ const ViolationManagement = () => {
       <AddButton onClick={handleAdd} label="Thêm vi phạm" icon={FaUserPlus} />
       <div className="flex gap-2 mt-4">
         <input
-          type="text"
-          placeholder="Tìm theo ID..."
-          value={inputId}
-          onChange={(e) => setInputId(e.target.value)}
+          type="datetime-local"
+          placeholder="Từ thời gian..."
+          value={inputMinTime}
+          onChange={(e) => setInputMinTime(e.target.value)}
           onKeyDown={(e) => e.key === "Enter" && handleSearch()}
-          className="p-2 border rounded w-1/3"
+          className="p-2 border rounded w-auto"
+        />
+        <input
+          type="datetime-local"
+          placeholder="Đến thời gian..."
+          value={inputMaxTime}
+          onChange={(e) => setInputMaxTime(e.target.value)}
+          onKeyDown={(e) => e.key === "Enter" && handleSearch()}
+          className="p-2 border rounded w-auto"
         />
         <input
           type="text"
@@ -82,7 +100,7 @@ const ViolationManagement = () => {
           value={inputPlate}
           onChange={(e) => setInputPlate(e.target.value)}
           onKeyDown={(e) => e.key === "Enter" && handleSearch()}
-          className="p-2 border rounded w-1/3"
+          className="p-2 border rounded w-auto"
         />
         <button
           onClick={handleSearch}
@@ -97,6 +115,7 @@ const ViolationManagement = () => {
           columns={columns}
           data={violations.map((violation: any) => ({
             id: violation.id,
+            created_at: violation.created_at ? new Date(violation.created_at).toLocaleString() : "",
             plate: violation.vehicle?.plate,
             category: violation.category,
             creator_id: violation.creator?.id,

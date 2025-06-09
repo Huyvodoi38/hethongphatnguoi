@@ -55,7 +55,7 @@ const VehicleManagement = () => {
           value={inputPlate}
           onChange={(e) => setInputPlate(e.target.value)}
           onKeyDown={(e) => e.key === "Enter" && handleSearch()}
-          className="p-2 border rounded w-1/3"
+          className="p-2 border rounded w-auto"
         />
         <button
           onClick={handleSearch}
